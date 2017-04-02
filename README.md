@@ -1,11 +1,11 @@
 # imgcollection
 A simple web-app for photo upload &amp; display, powered by Flask.
 
-Introduction
+# Introduction
 
 ImgCollection is a simple web application where users can upload images, add captions to their images, and sign up for accounts to edit the captions of their images, or delete them. The main page displays all the photos uploaded by every user, 10 photos per page. Users can navigate through all the photos by using the navigation bar at the bottom of the main page, which consists of page numbers. Each 10 photo (per page) can be seen by scrolling down, with their captions preceding, and the user who uploaded the photo following. The upload page allows anyone (even without signing in) to upload photos (only .jpg, .jpeg, .png, and .gif extensions are allowed). The photos uploaded by the default account (named as anonymous) are displayed as "Uploaded by anonymous". The sign-in & sign-up page allows users to create accounts, and sign into their accounts. The profile page shows all the images uploaded by the particular user, and allows them to edit the captions of their photos (by clicking the pencil mark), or to delete them (by clicking the trash can mark).
 
-Setup
+# Setup
 
 To setup the web application, first ensure that you have Python 3.5+ and MySQL installed on your system. Also you will need to install Flask and Flask-Mysql packages from pip, by issuing the following two commands:
 
