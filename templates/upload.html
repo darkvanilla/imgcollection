@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+  
+		<title>ImgCollection</title>
+    
+		<link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+		<link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+		<script type="text/javascript" src="../static/js/jQuery.js"></script>
+    
+   </head>
+  
+   <body>
+		<!-- DISPLAY UPPER NAVIGATION BAR -->
+		<div class="container">
+			<div class="header">
+				<nav>
+				  <ul class="nav nav-pills pull-right">
+					<li role="presentation" ><a href="/">Home</a></li>
+				  </ul>
+				</nav>
+				<h3 class="text-muted">ImgCollection</h3>
+			</div>
+		  
+			<!-- DISPLAY UPLOAD FIELD WITH CAPTION TO ENTER -->
+			<form action="/upload-photo" method="POST" enctype="multipart/form-data">
+				<label for="img_caption" class="sr-only">Caption for the Image</label>
+				<input type="name" name="img_caption" id="img_caption" class="form-control" placeholder="Caption for the Image">
+				
+				<label for="photo" class="sr-only">Photo Upload</label>
+				<input type="file" name="photo" />
+				<input type="submit" />
+			</form>
+			
+			<footer class="footer">
+				<p>&copy; ImgCollection 2017, Birkan Mert Erenler</p>
+			</footer>
+		</div>
+		
+   </body>
+</html>

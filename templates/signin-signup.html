@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  
+    <title>ImgCollection</title>
+    
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+	<script type="text/javascript" src="../static/js/jQuery.js"></script>
+    
+  </head>
+ 
+  <body>
+	<!-- DISPLAY UPPER NAVIGATION BAR -->
+    <div class="container">
+      <div class="header">
+        <nav>
+          <ul class="nav nav-pills pull-right">
+            <li role="presentation" ><a href="/">Home</a></li>
+          </ul>
+        </nav>
+        <h3 class="text-muted">ImgCollection</h3>
+      </div>
+
+	  <p>{{sign_up_msg}}</p> <!-- DISPLAY RESPONSE MESSAGE UPON SIGN-UP REQUEST -->
+		
+	  <!-- DISPLAY SIGN-IN -->
+      <div class="jumbotron">
+        <h1>Sign In</h1>
+        <form class="form-signin" action="/validate-login" method="post">
+        <label for="inputUsername" class="sr-only">Username</label>
+        <input type="name" name="inputUsername" id="inputUsername" class="form-control" placeholder="Username" required autofocus>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" name="inputPassword" id="inputPassword" class="form-control" placeholder="Password" required>
+         
+        <button id="btnSignIn" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+      </form>
+      </div>
+	  
+	  <!-- DISPLAY SIGN-UP -->
+      <div class="jumbotron">
+        <h1>Sign Up</h1>
+		<p>Welcome to ImgCollection! Pick a username shorter than 64 characters. Only letters, numbers, space and underscore is allowed. Choose a password that has a length of at least 8 characters, and containing at least 1 numeral, 1 upper-case letter, and 1 lower-case letter.</p>
+        <form class="form-signin" action="/sign-up" method="post">
+        <label for="inputNewUserame" class="sr-only">Pick a username...</label>
+        <input type="name" name="inputNewUsername" id="inputNewUsername" class="form-control" placeholder="Pick a username..." required autofocus>
+        <label for="inputPassword" class="sr-only">Enter your password here</label>
+        <input type="password" name="inputPassword" id="inputPassword" class="form-control" placeholder="Enter your password" required>
+         
+        <button id="btnSignUp" class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
+      </form>
+      </div>
+ 
+      <footer class="footer">
+        <p>&copy; ImgCollection 2017, Birkan Mert Erenler</p>
+      </footer>
+ 
+    </div>
+  </body>
+</html>

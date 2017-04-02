@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+
+    <title>ImgCollection</title>
+ 
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+	
+	<script type="text/javascript" src="../static/js/jQuery.js"></script>
+	<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+	
+	<script>
+		$(function(){
+			DisplayPhotos(1);
+		});
+		
+		// Function to display photos, given the current _page as input.
+		function DisplayPhotos(_page) {
+			
+			var _offset = (_page - 1) * 10; //_offset to be sent to Flask.
+			
+			$.ajax({
+				url: 'display-photos-main', //call routine from Flask.
+				type: 'POST',
+				data: {
+					offset: _offset
+				},
+				success: function(res) {
+					var PHOTOS_PER_PAGE = 10
+					
+					// Get photo information from Flask
+					var photoObj = JSON.parse(res);
+					var sizePhotoObj = photoObj.length;
+					var total = photoObj[sizePhotoObj-1]['total'];
+					var photos = [];
+					for (var i=0; i < sizePhotoObj-1; i++)
+						photos[i] = photoObj[i];
+					photoObj = photos;
+					
+					// Add photos to template
+					$('#ulist').empty();
+					$('#listTemplate').tmpl(photoObj).appendTo('#ulist');
+					
+					// Calculate the number of pages needed to display 10 per page
+					var pageCount = total / PHOTOS_PER_PAGE;
+					var pageRem = total % PHOTOS_PER_PAGE;
+					if(pageRem != 0) {
+						pageCount = Math.floor(pageCount)+1;
+					}
+					
+					// For pagination, get the start and end pages
+					$('.pagination').empty();
+					var pageStart = $('#hdnStart').val();
+					var pageEnd = $('#hdnEnd').val();
+					
+					// After website accumulates more than 10 pages, display << button, i.e., previous button.
+					if(pageStart > 10) {
+						var aPrev = $('<a/>').attr({
+								'href': '#'
+							}, {
+								'aria-label': 'Previous'
+							})
+							.append($('<span/>').attr('aria-hidden', 'true').html('&laquo;'));
+						
+						// On click, get the previous start and end page numbers, and display photos with proper _offset.
+						$(aPrev).click(function() {
+							$('#hdnStart').val(Number(pageStart) - 10);
+							$('#hdnEnd').val(Number(pageStart) - 10 + 9);
+							DisplayPhotos(Number(pageStart) - 10);
+						});
+		 
+						var prevLink = $('<li/>').append(aPrev);
+						$('.pagination').append(prevLink);
+					}
+					
+					// Display the navigate bar page numbers, and display photos on those pages when clicked.
+					for (var i = Number(pageStart); i < Number(pageEnd); i++) {
+						if (i > pageCount) {
+							break;
+						}
+						
+						var aPage = $('<a/>').attr('href', '#').text(i);
+						
+						$(aPage).click(function(i) {
+							return function() {
+								DisplayPhotos(i);
+							}
+						}(i));
+						var page = $('<li/>').append(aPage);
+						
+						if ((_page) == i) {
+							$(page).attr('class', 'active');
+						}
+						
+						$('.pagination').append(page);
+					}
+					
+					// After website accumulates more than 10 pages, display >> button, i.e., next button.
+					if ((Number(pageStart) + 10) <= pageCount) {
+						var nextLink = $('<li/>').append($('<a/>').attr({
+								'href': '#'
+							}, {
+								'aria-label': 'Next'
+							})
+							.append($('<span/>').attr('aria-hidden', 'true').html('&raquo;').click(function() {
+								// On click, get the previous start and end page numbers, and display photos with proper _offset.
+								$('#hdnStart').val(Number(pageStart) + 10);
+								$('#hdnEnd').val(Number(pageStart) + 10 + 9);
+								DisplayPhotos(Number(pageStart) + 10);
+		 
+							})));
+						$('.pagination').append(nextLink);
+					}
+					
+					
+				},
+				error: function(error) {
+					console.log(error);
+				}
+			});
+		}
+	</script>
+	
+</head>
+ 
+<body>
+	
+	<!-- TEMPLATE FOR PHOTOS -->
+	<script id="listTemplate" type="text/x-jQuery-tmpl">
+		<div class="list-group">
+			<div class="list-group-heading row">
+				<h3> Caption: ${caption} </h3>
+			</div>
+			<div class="list-group-item row">
+				<img src="uploads/${name}" />
+			</div>
+			<div class="list-group-text row">
+				<p> Photo uploaded by ${owner} </p>
+			</div>
+		</div>
+	</script>
+	
+	<!-- DISPLAY UPPER NAVIGATION BAR -->
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul class="nav nav-pills pull-right">
+                    <li role="presentation" class="/"><a href="profile">Profile</a>
+                    </li>
+                    <li role="presentation"><a href="upload">Upload</a>
+                    </li>
+                    <li role="presentation"><a href={{user_href}}>{{user_link_string}}</a>
+                    </li>
+                </ul>
+            </nav>
+            <h3 class="text-muted">ImgCollection: Upload images online.</h3>
+        </div>
+		
+		<!-- DISPLAY PHOTOS WITH THE TEMPLATE ABOVE -->
+		<div class="jumbotron">
+			<div class="row">
+				<h3>Images Uploaded by Everyone:</h3>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+			 
+					<div class="panel-body">
+			 
+						<ul id="ulist" class="list-group">
+			 
+			 
+			 
+						</ul>
+						
+						<nav>
+							<ul class="pagination">
+								<!-- dynamic pagination -->
+							</ul>
+						</nav>
+						
+					</div>
+			 
+				</div>
+			</div>
+		</div>
+		
+		<input type="hidden" id="hdnStart" value="1" />
+		<input type="hidden" id="hdnEnd" value="5" />
+		
+        <footer class="footer">
+            <p>&copy; ImgCollection 2017, Birkan Mert Erenler</p>
+        </footer>
+ 
+    </div>
+</body>
+ 
+</html>

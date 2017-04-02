@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+
+    <title>ImgCollection</title>
+ 
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+	
+	<script type="text/javascript" src="../static/js/jQuery.js"></script>
+	<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+	
+	<script>
+	$(document).ready(function(){
+		// Function to update photo caption
+		$('#btnUpdate').click(function() {
+			$.ajax({
+				url: 'update-photo-caption',
+				data: {
+					caption: $('#editCaption').val(),
+					id: localStorage.getItem('photoid')
+				},
+				type: 'POST', // send the updated caption to Flask
+				success: function(res) {
+					// Hide the modal dialogue and get the photos again, updated.
+					$('#editModal').modal('hide');
+					GetPhotos();
+				},
+				error: function(error) {
+					console.log(error);
+				}
+			})
+		});
+	});
+	</script>
+	
+	<script>
+	$(document).ready(function(){
+		// Function to get all the photos of the user, when the page is created first
+		$(function() {
+			$.ajax({
+				url: 'display-photos-profile',
+				type: 'GET',
+				success: function(res) {
+					var photoObj = JSON.parse(res);
+					$('#listTemplate').tmpl(photoObj).appendTo('#ulist'); // add to template
+				},
+				error: function(error) {
+					console.log(error);
+				}
+			});
+		});
+	});
+	</script>
+	
+	<script type="text/javascript">
+		// Function to get all the photos of the user, after edit or delete
+		function GetPhotos() {
+			$.ajax({
+				url: 'display-photos-profile',
+				type: 'GET',
+				success: function(res) {
+					var photoObj = JSON.parse(res);
+					$('#ulist').empty(); // empty the old template
+					$('#listTemplate').tmpl(photoObj).appendTo('#ulist'); // add to template
+				},
+				error: function(error) {
+					console.log(error);
+				}
+			});
+		}
+	</script>
+		
+	<script type="text/javascript">
+		// Function to edit the selected photo's caption
+		function Edit(elm) {
+			// Get photo info from Flask
+			$.ajax({
+				url: 'get-photo-by-id',
+				data: {
+					photoid: $(elm).attr('data-id')
+				},
+				type: 'POST',
+				success: function(res) {
+					var data = JSON.parse(res);
+					
+					localStorage.setItem('photoid', data[0]['photoid']); // save photoid inside document
+					$('#editCaption').val(data[0]['caption']); // fill the field with the old caption
+					$('#editModal').modal(); // trigger the modal dialogue
+				},
+				error: function(error) {
+					console.log(error);
+				}
+			});
+		}
+	</script>
+	
+	<script>
+		// Function to confirm deleting the selected photo
+		function ConfirmDelete(elem) {
+			localStorage.setItem('deleteId', $(elem).attr('data-id'));
+			$('#deleteModal').modal();
+		}
+	</script>
+	
+	<script>
+		// Function to delete the selected photo
+		function Delete() {
+			$.ajax({
+				url: 'delete-photo',
+				data: {
+					photoid: localStorage.getItem('deleteId')
+				},
+				type: 'POST', // send photoid to be deleted to Flask
+				success: function(res) {
+					var result = JSON.parse(res);
+					// Hide the modal after deleting, and display photos
+					if (result.status == 'OK') {
+						$('#deleteModal').modal('hide');
+						GetPhotos();
+					} else {
+						alert(result.status);
+					}
+				},
+				error: function(error) {
+					console.log(error);
+				}
+			});
+		}
+	</script>
+	
+	<style type="text/css">
+		.trash {
+			color: rgb(209, 91, 71);
+		}
+		.panel-body .checkbox {
+			display: inline-block;
+			margin: 0px;
+		}
+		.list-group {
+			margin-bottom: 0px;
+		}
+		.smallpic {
+			height = 100px;
+			width = 100px;
+		}
+	</style>
+	
+</head>
+ 
+<body>
+	
+	<script id="listTemplate" type="text/x-jQuery-tmpl">
+		<!-- DISPLAY PHOTOS WITH CAPTIONS -->
+		<li class="list-group-item">
+			<div class="checkbox">
+				<img height="60px" width="120px" src="uploads/${name}" />
+				<label>
+					${caption}
+				</label>
+			</div>
+			
+			<!-- DISPLAY EDIT AND DELETE ICONS -->
+			<div class="pull-right action-buttons">
+				<a data-id=${photoid} onclick="Edit(this)" ><span class="glyphicon glyphicon-pencil"></span></a>
+				<a data-id=${photoid} onclick="ConfirmDelete(this)" ><span class="glyphicon glyphicon-trash"></span></a>
+			</div>
+		</li>
+	</script>
+	
+	<!-- DISPLAY UPPER NAVIGATION BAR -->
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul class="nav nav-pills pull-right">
+                    <li role="presentation" class="/"><a href="/">Home</a>
+                    </li>
+                    <li role="presentation"><a href="upload">Upload</a>
+                    </li>
+                    <li role="presentation"><a href="logout">{{user_link_string}}</a>
+                    </li>
+                </ul>
+            </nav>
+            <h3 class="text-muted">ImgCollection: Upload images online.</h3>
+        </div>
+		
+		<!-- DISPLAY PHOTOS UPLOADED BY THE USER WITH EDIT AND DELETE ICONS -->
+		<div class="jumbotron">
+			<div class="row">
+				<h3>Edit captions of your photos, or delete them:</h3>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+			 
+					<div class="panel-body">
+			 
+						<ul id="ulist" class="list-group">
+			 
+			 
+			 
+						</ul>
+					</div>
+			 
+				</div>
+			</div>
+		</div>
+		
+		<footer class="footer">
+            <p>&copy; ImgCollection 2017, Birkan Mert Erenler</p>
+        </footer>
+
+    </div>
+	
+	<!-- MODAL DIALOGUE DISPLAY FOR EDITING CAPTIONS -->
+	<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+					</button>
+					<h4 class="modal-title" id="editModalLabel">Update Caption</h4>
+				</div>
+				<div class="modal-body">
+					<form role="form">
+						<div class="form-group">
+							<label for="recipient-name" class="control-label">Caption:</label>
+							<input type="text" class="form-control" id="editCaption">
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button id="btnUpdate" type="button" class="btn btn-primary">Update</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- MODAL DIALOGUE DISPLAY FOR DELETING PHOTOS -->
+	<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header" style="text-align:center;">
+					<h4 class="modal-title" style="color:red;" id="deleteModalLabel">Are you sure to delete the photo permanently?</h4>
+				</div>
+	 
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-primary" onclick="Delete()">Delete</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</body>
+ 
+</html>
