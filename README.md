@@ -40,3 +40,13 @@ Don't forget to change values above to your own MySQL settings. Now, you can sta
 	python app.py
 
 Now, open a browser, and navigate to http://localhost:5000, i.e., http://127.0.0.1:5000 (if you use the localhost).
+
+# Note
+
+This simple web app is "really simple". If you would like to add any feature to ImgCollection, or improve it (especially its GUI), feel free to submit pull requests.
+
+Inspired by the Python Flask tutorial https://code.tutsplus.com/tutorials/creating-a-web-app-from-scratch-using-python-flask-and-mysql--cms-22972.
+
+# Licence
+
+This project is licensed under the MIT licence.
